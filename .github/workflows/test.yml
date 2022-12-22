@@ -16,7 +16,11 @@ permissions:
 
 jobs:
   test_devpy:
-    runs-on: ubuntu-latest
+    name: Test ${{ matrix.os }}
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [ubuntu-latest, windows-latest, macos-latest]
     steps:
       - uses: actions/checkout@v3
       - uses: actions/setup-python@v4
@@ -25,7 +29,7 @@ jobs:
       - name: Install
         run: |
           pip install -e .
-          pip install pytest meson-python ninja
+          pip install pytest meson-python ninja mock
       - name: Test
         shell: 'script -q -e -c "bash --noprofile --norc -eo pipefail {0}"'
         env:
@@ -34,3 +38,12 @@ jobs:
           cd example_pkg
           ./dev.py build
           ./dev.py test
+       - name: Test
+        shell: 'script -q -e -c "bash --noprofile --norc -eo pipefail {0}"'
+        env:
+          TERM: xterm-256color
+        run: |
+          python -m pytest devpy/tests
+          ./dev.py build
+          ./dev.py test
+      

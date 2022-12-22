@@ -41,15 +41,30 @@ def get_site_packages(build_dir):
         for subdir in dirs:
             if subdir == "site-packages":
                 candidate_paths.append(os.path.abspath(os.path.join(root, subdir)))
-
     if len(candidate_paths) == 0:
-        return None
-
-    # Prefer paths with current Python version in them
+        raise ValueError(f"cannot find any 'site-packages' in {build_dir}")
+    if len(candidate_paths) == 1:
+        # Windows: will have a "Lib" in the path, or a single python version
+        return candidate_paths[0]
+    # Find paths with current Python version in them
     X, Y = sys.version_info.major, sys.version_info.minor
-    candidate_paths = sorted(candidate_paths, key=lambda p: f"python{X}.{Y}" in p)
-    candidate_paths = sorted(candidate_paths, key=lambda p: f"python{X}" in p)
-    return candidate_paths[-1]
+    minor_paths = [p for p in candidate_paths if f"python{X}.{Y}" in p.split(os.sep)]
+    if len(minor_paths) > 1:
+        raise ValueError(
+            f"cannot find proper 'site-packages' to use in {build_dir}, more than one 'python{X}.{Y}'"
+        )
+    if len(minor_paths) == 1:
+        return minor_paths[0]
+    major_paths = [p for p in candidate_paths if f"python{X}" in p.split(os.sep)]
+    if len(major_paths) > 1:
+        raise ValueError(
+            f"cannot find proper 'site-packages' to use in {build_dir}, more than one 'python{X}'"
+        )
+    if len(major_paths) == 1:
+        return major_paths[0]
+    raise ValueError(
+        f"cannot find any 'site-packages' in {build_dir} suitable for python{X}.{Y}"
+    )
 
 
 def set_pythonpath(build_dir):
