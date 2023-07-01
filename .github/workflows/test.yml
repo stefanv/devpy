@@ -51,6 +51,7 @@ jobs:
           spin test
           spin sdist
           spin example
+          spin docs
       - name: Functional tests (other)
         if: matrix.os != 'ubuntu-latest'
         shell: bash
