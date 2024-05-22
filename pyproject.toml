@@ -28,7 +28,7 @@ dependencies = [
   "colorama; platform_system == 'Windows'",
   "importlib_metadata >= 7"
 ]
-dynamic = ['version']
+dynamic = ["version"]
 
 [project.scripts]
 spin = "spin.__main__:main"
@@ -41,10 +41,13 @@ dev = ["changelist == 0.5"]
 homepage = "https://github.com/scientific-python/spin"
 
 [tool.setuptools.dynamic.version]
-attr = 'spin.__version__'
+attr = "spin.__version__"
 
 [tool.setuptools.packages.find]
 include = ["spin*"]
+
+[tools.setuptools.package-data]
+spin = ["py.typed"]
 
 [tool.pytest.ini_options]
 filterwarnings = [
